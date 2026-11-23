@@ -1,0 +1,8 @@
+{
+  "name": "code-screenshots",
+  "private": true,
+  "description": "題三程式碼截圖產生器",
+  "dependencies": {
+    "highlight.js": "11.9.0"
+  }
+}

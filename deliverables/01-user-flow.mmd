@@ -1,0 +1,58 @@
+---
+title: 題一｜使用者申請流程（Web / App 共用後端）
+config:
+  themeVariables:
+    fontSize: 18px
+  flowchart:
+    nodeSpacing: 30
+    rankSpacing: 45
+    wrappingWidth: 240
+---
+flowchart TB
+    subgraph ROW1["階段一｜進入與分流（不需個資）"]
+        direction LR
+        WEB(["Web"]) --> PICK
+        APP(["App"]) --> PICK
+        PICK["選擇補助類別"] --> OPEN{"類別開放中？<br/>時段、受理日期"}
+        OPEN -->|否| E0["尚未開放<br/>顯示下次可申請時間<br/>不必排隊"]
+        OPEN -->|是| TYPE{"類型分流"}
+        TYPE -->|租金補貼| CH_RENT["租金補貼通道<br/>容量最大"]
+        TYPE -->|其他類別| CH_OTHER["一般類別通道"]
+        CH_RENT --> LOAD
+        CH_OTHER --> LOAD
+        LOAD{"動態分流<br/>通道負載"}
+        LOAD -->|偏高| QUEUE["虛擬等候室<br/>號碼牌、預估等待"]
+        LOAD -->|正常| PASS(["取得進場資格"])
+        QUEUE -->|輪到號碼| PASS
+        LOAD -->|滿載| E2["【錯誤】伺服器滿載<br/>503 + 建議重試時間<br/>表單保留在裝置上"]
+        QUEUE -->|等候 > 30 分| E1["【錯誤】排隊太久<br/>保留號碼牌、可離開<br/>App：輪到時推播<br/>Web：憑號碼牌回來進場"]
+        E2 -.->|稍後重試| LOAD
+        E1 -.->|輪到號碼| PASS
+    end
+
+    subgraph ROW2["階段二｜登入與申請"]
+        direction LR
+        LOGIN["登入<br/>自然人憑證 / TW FidO<br/>向戶政取得戶籍地（僅一次）"] --> REGION
+        REGION{"戶籍地區<br/>受理中？"} -->|是| FORM["填寫申請表<br/>前端格式驗證"]
+        FORM --> CHECK{"後端資格驗證<br/>年齡、時段、受理日期、<br/>本月是否已申請"}
+        CHECK -->|符合| ACCEPT(["受理<br/>原子寫入防重複<br/>非同步落地＋推播"])
+        REGION -->|暫停| E4["【錯誤】地區暫停<br/>顯示公告與恢復時間<br/>App：開放時推播<br/>Web：登入時提示"]
+        CHECK -->|"不符（依 reasonCode）"| E3["【錯誤】申請類別不符<br/>顯示具體原因<br/>與下次可申請時間<br/>未滿 20 歲／本月已申請<br/>已過時段"]
+    end
+
+    ROW1 ==> ROW2
+
+    classDef entry fill:#E8F6EE,stroke:#00A651,stroke-width:2px,color:#0B3D22
+    classDef strategy fill:#00A651,stroke:#007A3D,stroke-width:2px,color:#FFFFFF
+    classDef error fill:#FDECEC,stroke:#D93025,stroke-width:2px,color:#7A1712
+    classDef info fill:#FFF6E5,stroke:#E8A100,stroke-width:2px,color:#5C3D00
+    classDef step fill:#FFFFFF,stroke:#5F6B66,stroke-width:1px,color:#1F2A24
+
+    class WEB,APP,PASS,ACCEPT entry
+    class TYPE,LOAD,QUEUE strategy
+    class E1,E2,E3,E4 error
+    class E0 info
+    class PICK,OPEN,LOGIN,CH_RENT,CH_OTHER,REGION,FORM,CHECK step
+
+    style ROW1 fill:#F7F9F8,stroke:#B8C2BD
+    style ROW2 fill:#F7F9F8,stroke:#B8C2BD

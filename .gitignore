@@ -1,0 +1,16 @@
+# Maven 建置產出
+target/
+
+# Node 套件
+node_modules/
+
+# 作業系統與編輯器
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.iml
+
+# Office 暫存檔
+~$*

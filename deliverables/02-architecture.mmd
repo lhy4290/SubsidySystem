@@ -1,0 +1,49 @@
+---
+title: 題一｜系統架構圖　　跨系統資料傳遞：mTLS ＋ API 簽章 ＋ 只傳最少必要欄位
+config:
+  themeVariables:
+    fontSize: 18px
+  flowchart:
+    nodeSpacing: 30
+    rankSpacing: 45
+    wrappingWidth: 240
+---
+flowchart TB
+    subgraph ROW1["請求路徑｜同步"]
+        direction LR
+        WEB["Web SPA"] --> CDN
+        APP["App<br/>iOS / Android"] --> CDN
+        CDN["CDN / WAF<br/>放靜態資源<br/>擋 DDoS、機器人"] --> VWR["虛擬等候室<br/>發號碼牌"]
+        VWR --> GW["API Gateway<br/>身分驗證<br/>依身分或裝置 token 限流<br/>依類型路由"]
+        GW --> LB["Load Balancer"]
+        LB --> SVC["申請服務<br/>依類別分池<br/>Auto Scaling"]
+        SVC --> REDIS[("Redis<br/>規則、時段、號碼牌<br/>防重複：SETNX 原子寫入")]
+        GW -->|"登入時查一次：身分證、生日"| MOI["內政部戶政<br/>驗證身分、生日、戶籍地"]
+    end
+
+    subgraph ROW2["處理與資料｜非同步"]
+        direction LR
+        MQ[["Kafka<br/>削峰、非同步落地"]] --> WORKER["申請處理 Worker"]
+        WORKER --> DB[("主資料庫＋唯讀副本<br/>唯一鍵：防重複最終防線<br/>身分證只存雜湊")]
+        WORKER -->|"申請編號、身分證、資格結果"| AGENCY["主管部會補助系統<br/>例：租金補貼 → 國土署"]
+        AGENCY -->|"核定名單"| BANK["金融機構<br/>撥款"]
+        WORKER --> NOTIFY["通知服務<br/>App 推播<br/>身分證雜湊對應推播 token"]
+        OPS["監控維運<br/>APM、集中化 Log<br/>（身分證遮罩）、告警"]
+        DB ~~~ OPS
+    end
+
+    ROW1 ==>|"申請服務送出申請 → Kafka"| ROW2
+
+
+    classDef core fill:#00A651,stroke:#007A3D,stroke-width:2px,color:#FFFFFF
+    classDef data fill:#E8F6EE,stroke:#00A651,stroke-width:2px,color:#0B3D22
+    classDef ext fill:#FFF6E5,stroke:#E8A100,stroke-width:2px,color:#5C3D00
+    classDef plain fill:#FFFFFF,stroke:#5F6B66,stroke-width:1px,color:#1F2A24
+
+    class GW,VWR,LB core
+    class REDIS,MQ,DB data
+    class MOI,AGENCY,BANK ext
+    class WEB,APP,CDN,SVC,WORKER,OPS,NOTIFY plain
+
+    style ROW1 fill:#F7F9F8,stroke:#B8C2BD
+    style ROW2 fill:#F7F9F8,stroke:#B8C2BD

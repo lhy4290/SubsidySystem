@@ -1,0 +1,54 @@
+---
+title: 題三｜前端程式流程圖（App）
+config:
+  themeVariables:
+    fontSize: 18px
+  flowchart:
+    nodeSpacing: 30
+    rankSpacing: 45
+    wrappingWidth: 240
+---
+flowchart TB
+    subgraph ROW1["輸入與前端驗證"]
+        direction LR
+        START(["開啟申請表單"]) --> INPUT["使用者輸入<br/>類別、生日、身分證字號"]
+        INPUT --> NORM["正規化<br/>全形轉半形、去前後空白<br/>身分證轉大寫"]
+        NORM --> FMT{"格式驗證（錯誤處理 1）<br/>每個欄位即時檢查"}
+        FMT -->|錯誤| ERR_FMT["欄位紅框＋下方紅字說明<br/>送出按鈕 disabled<br/>（畫面 2）"]
+        ERR_FMT -.->|修改輸入| INPUT
+        FMT -->|全部正確| CONSENT{"已勾選<br/>個資告知同意？"}
+        CONSENT -->|否| HOLD["送出按鈕維持 disabled"]
+        CONSENT -->|是| READY(["送出按鈕可按"])
+    end
+
+    subgraph ROW2["呼叫 API 與顯示結果"]
+        direction LR
+        CLICK["按下送出<br/>按鈕立即 disabled<br/>防止重複點擊"] --> CALL["POST /eligibility"]
+        CALL --> HTTP{"HTTP 狀態"}
+        HTTP -->|"429 / 503"| BUSY["排隊或稍後再試<br/>依 Retry-After 倒數<br/>（畫面 3）"]
+        HTTP -->|"逾時 / 斷線"| NET["提示網路異常<br/>保留輸入、可重試"]
+        HTTP -->|200| ELIG{"eligible？"}
+        ELIG -->|true| OK["可受理＋送出申請按鈕<br/>（畫面 4）"]
+        OK --> APPLY["POST /applications<br/>後端重跑全部檢查<br/>＋原子寫入防重複"]
+        APPLY -->|"eligible = true"| DONE(["已受理"])
+        APPLY -->|"eligible = false<br/>（例：拖過 18:00、<br/>同時送出兩次）"| CODE
+        ELIG -->|false| CODE{"依 reasonCode 分流"}
+        CODE -->|"錯誤處理 2<br/>OUT_OF_SERVICE_HOURS<br/>OUT_OF_APPLICATION_PERIOD"| ERR_TIME["未開放<br/>顯示 nextAvailableAt<br/>可設定提醒（畫面 5）"]
+        CODE -->|"錯誤處理 3<br/>ALREADY_APPLIED_THIS_MONTH"| ERR_DUP["本月已受理<br/>顯示 nextAvailableAt（畫面 6）"]
+        CODE -->|"UNDER_AGE / INVALID_*"| ERR_OTHER["顯示具體原因<br/>INVALID_* 回表單標示欄位"]
+    end
+
+    ROW1 ==>|使用者按下送出| ROW2
+
+    classDef entry fill:#E8F6EE,stroke:#00A651,stroke-width:2px,color:#0B3D22
+    classDef key fill:#00A651,stroke:#007A3D,stroke-width:2px,color:#FFFFFF
+    classDef error fill:#FDECEC,stroke:#D93025,stroke-width:2px,color:#7A1712
+    classDef step fill:#FFFFFF,stroke:#5F6B66,stroke-width:1px,color:#1F2A24
+
+    class START,READY,OK,DONE entry
+    class FMT,CODE key
+    class ERR_FMT,ERR_TIME,ERR_DUP,ERR_OTHER,BUSY,NET error
+    class INPUT,NORM,CONSENT,HOLD,CLICK,CALL,HTTP,ELIG,APPLY step
+
+    style ROW1 fill:#F7F9F8,stroke:#B8C2BD
+    style ROW2 fill:#F7F9F8,stroke:#B8C2BD

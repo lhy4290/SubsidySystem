@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>補助申請 App Wireframe</title>
+<style>
+  :root {
+    --green: #00A651;
+    --green-dark: #007A3D;
+    --green-soft: #E8F6EE;
+    --red: #D93025;
+    --red-soft: #FDECEC;
+    --amber: #B26A00;
+    --amber-soft: #FFF6E5;
+    --ink: #1F2A24;
+    --muted: #5F6B66;
+    --line: #D5DCD8;
+    --bg: #F2F4F3;
+    --card: #FFFFFF;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
+    padding: 32px 16px 48px;
+  }
+  h1 { text-align: center; font-size: 22px; margin-bottom: 6px; }
+  .sub { text-align: center; color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 340px);
+    gap: 36px 40px;
+    justify-content: center;
+  }
+  @media (max-width: 1160px) { .grid { grid-template-columns: repeat(2, 340px); } }
+  @media (max-width: 760px)  { .grid { grid-template-columns: 340px; } }
+
+  .slot { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .caption { font-size: 15px; font-weight: 700; }
+  .caption span { color: var(--green); margin-right: 8px; }
+  .note { font-size: 12.5px; color: var(--muted); text-align: center; max-width: 320px; line-height: 1.5; }
+
+  .phone {
+    width: 340px; height: 700px; background: var(--card);
+    border: 10px solid #1F2A24; border-radius: 36px; overflow: hidden;
+    display: flex; flex-direction: column; position: relative;
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  }
+  .status { height: 28px; font-size: 12px; display: flex; justify-content: space-between; align-items: center; padding: 0 18px; color: var(--muted); }
+  .appbar { background: var(--green); color: #fff; padding: 12px 16px; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+  .appbar .back { font-size: 18px; opacity: .9; }
+  .content { flex: 1; padding: 18px 16px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+  .footer { padding: 14px 16px 18px; border-top: 1px solid var(--line); }
+
+  label { font-size: 13px; font-weight: 700; display: block; margin-bottom: 6px; }
+  .field { border: 1.5px solid var(--line); border-radius: 10px; padding: 11px 12px; font-size: 15px;
+           display: flex; justify-content: space-between; align-items: center; background: #fff; }
+  .field .ph { color: #9AA59F; }
+  .field .kind { font-size: 12px; color: #9AA59F; }
+  .field.err { border-color: var(--red); background: var(--red-soft); }
+  .field.ok { border-color: var(--green); }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 5px; }
+  .errmsg { font-size: 12.5px; color: var(--red); margin-top: 6px; font-weight: 700; }
+  .okmsg { font-size: 12px; color: var(--green-dark); margin-top: 5px; }
+
+  .privacy { background: var(--green-soft); border-radius: 10px; padding: 11px 12px; font-size: 12px; line-height: 1.6; color: #0B3D22; }
+  .privacy b { display: block; margin-bottom: 2px; font-size: 12.5px; }
+  .check { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; }
+  .box { width: 18px; height: 18px; border: 2px solid var(--muted); border-radius: 4px; flex: none; margin-top: 1px; }
+  .box.on { background: var(--green); border-color: var(--green); position: relative; }
+
+  .btn { width: 100%; border: 0; border-radius: 12px; padding: 14px; font-size: 16px; font-weight: 700;
+         background: var(--green); color: #fff; font-family: inherit; }
+  .btn.disabled { background: #C9D1CD; color: #F4F6F5; }
+  .btn.ghost { background: #fff; color: var(--green-dark); border: 1.5px solid var(--green); margin-top: 10px; }
+
+  .center { align-items: center; text-align: center; }
+  .badge { width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center; font-size: 17px; font-weight: 700; margin: 8px auto 2px; }
+  .badge.ok { background: var(--green-soft); color: var(--green); }
+  .badge.no { background: var(--red-soft); color: var(--red); }
+  .badge.wait { background: var(--amber-soft); color: var(--amber); }
+  .title { font-size: 20px; font-weight: 700; }
+  .desc { font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+
+  .ticket { border: 2px dashed var(--green); border-radius: 14px; padding: 16px; width: 100%; }
+  .ticket .label { font-size: 12px; color: var(--muted); }
+  .ticket .num { font-size: 40px; font-weight: 800; color: var(--green-dark); letter-spacing: 1px; }
+  .bar { height: 10px; background: #E3E8E5; border-radius: 99px; overflow: hidden; width: 100%; }
+  .bar i { display: block; height: 100%; width: 62%; background: var(--green); }
+  .stats { display: flex; width: 100%; gap: 10px; }
+  .stat { flex: 1; background: #F7F9F8; border-radius: 10px; padding: 10px; }
+  .stat b { display: block; font-size: 20px; }
+  .stat span { font-size: 12px; color: var(--muted); }
+  .warn { background: var(--amber-soft); color: #5C3D00; border-radius: 10px; padding: 10px 12px; font-size: 12.5px; line-height: 1.6; width: 100%; text-align: left; }
+
+  .summary { width: 100%; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; text-align: left; }
+  .row { display: flex; justify-content: space-between; padding: 10px 12px; font-size: 13.5px; border-bottom: 1px solid var(--line); }
+  .row:last-child { border-bottom: 0; }
+  .row span:first-child { color: var(--muted); }
+
+  .next { background: var(--green-soft); border-radius: 12px; padding: 14px; width: 100%; }
+  .next .label { font-size: 12px; color: var(--muted); }
+  .next .when { font-size: 22px; font-weight: 800; color: var(--green-dark); margin-top: 2px; }
+  .code { font-family: Consolas, monospace; font-size: 11px; color: var(--muted); }
+</style>
+</head>
+<body>
+  <h1>補助線上申請 App｜查詢到取得結果</h1>
+  <p class="sub">Wireframe：6 個畫面對應前端程式流程圖中的畫面 1–6</p>
+
+  <div class="grid">
+
+    <!-- 1 申請表單 -->
+    <div class="slot">
+      <div class="phone">
+        <div class="status"><span>10:15</span><span>5G</span></div>
+        <div class="appbar">補助資格查詢</div>
+        <div class="content">
+          <div>
+            <label>補助類別</label>
+            <div class="field"><span>運動補助</span><span class="kind">下拉選單</span></div>
+            <div class="hint">本月受理：15–25 日，每日 09:00–18:00（由伺服器設定載入）</div>
+          </div>
+          <div>
+            <label>出生年月日</label>
+            <div class="field"><span>1998-05-20</span><span class="kind">日期選擇器</span></div>
+          </div>
+          <div>
+            <label>身分證字號</label>
+            <div class="field"><span>A123456789</span><span></span></div>
+          </div>
+          <div class="privacy">
+            <b>個人資料蒐集告知</b>
+            身分證字號用於資格查詢與防止重複申請，系統只保存其雜湊值，不保存明碼；生日僅用於年齡檢核，不保存。資料將提供主管機關審核、金融機構撥款使用。
+          </div>
+          <div class="check"><div class="box on"></div><span>我已閱讀並同意上述個資告知（v1.2）</span></div>
+        </div>
+        <div class="footer"><button class="btn">查詢資格</button></div>
+      </div>
+      <div class="caption"><span>畫面 1</span>申請表單</div>
+      <div class="note">同意勾選後才能送出；告知內容含利用對象（個資法第 8 條），勾選的版本與時間會被記錄。</div>
+    </div>
+
+    <!-- 2 輸入錯誤 -->
+    <div class="slot">
+      <div class="phone">
+        <div class="status"><span>10:16</span><span>5G</span></div>
+        <div class="appbar">補助資格查詢</div>
+        <div class="content">
+          <div>
+            <label>補助類別</label>
+            <div class="field ok"><span>運動補助</span><span class="kind">下拉選單</span></div>
+          </div>
+          <div>
+            <label>出生年月日</label>
+            <div class="field err"><span>2023-02-29</span><span class="kind">日期選擇器</span></div>
+            <div class="errmsg">2023 年沒有 2 月 29 日，請重新選擇</div>
+          </div>
+          <div>
+            <label>身分證字號</label>
+            <div class="field err"><span>A123456788</span><span></span></div>
+            <div class="errmsg">身分證字號檢查碼錯誤，請確認最後一碼</div>
+          </div>
+          <div class="privacy">
+            <b>個人資料蒐集告知</b>
+            身分證字號用於資格查詢與防止重複申請，系統只保存其雜湊值，不保存明碼；生日僅用於年齡檢核，不保存。資料將提供主管機關審核、金融機構撥款使用。
+          </div>
+          <div class="check"><div class="box on"></div><span>我已閱讀並同意上述個資告知（v1.2）</span></div>
+        </div>
+        <div class="footer"><button class="btn disabled">查詢資格</button></div>
+      </div>
+      <div class="caption"><span>畫面 2</span>輸入錯誤</div>
+      <div class="note">離開欄位即檢查；錯誤欄位紅框＋下方紅字說明，任何欄位錯誤時送出按鈕 disabled。</div>
+    </div>
+
+    <!-- 3 排隊 -->
+    <div class="slot">
+      <div class="phone">
+        <div class="status"><span>10:17</span><span>5G</span></div>
+        <div class="appbar">排隊中</div>
+        <div class="content center">
+          <div class="badge wait">排隊中</div>
+          <div class="title">目前申請人數眾多</div>
+          <div class="ticket">
+            <div class="label">您的號碼牌</div>
+            <div class="num">#12,345</div>
+          </div>
+          <div class="stats">
+            <div class="stat"><b>3,210</b><span>前方人數</span></div>
+            <div class="stat"><b>約 8 分鐘</b><span>預估等待</span></div>
+          </div>
+          <div class="bar"><i></i></div>
+          <div class="warn">
+            請勿重新整理或關閉 App，否則需重新取號。<br>
+            若等候超過 30 分鐘，可先離開，輪到時以推播通知您。
+          </div>
+        </div>
+        <div class="footer"><button class="btn ghost" style="margin-top:0">輪到時通知我</button></div>
+      </div>
+      <div class="caption"><span>畫面 3</span>排隊等候</div>
+      <div class="note">收到 429／503 時顯示；依 Retry-After 更新，號碼牌保存在裝置上。</div>
+    </div>
+
+    <!-- 4 可受理 -->
+    <div class="slot">
+      <div class="phone">
+        <div class="status"><span>10:25</span><span>5G</span></div>
+        <div class="appbar"><span class="back">‹</span>查詢結果</div>
+        <div class="content center">
+          <div class="badge ok">可受理</div>
+          <div class="title">符合受理資格</div>
+          <div class="desc">請於今日 18:00 前完成送出申請</div>
+          <div class="summary">
+            <div class="row"><span>補助類別</span><span>運動補助</span></div>
+            <div class="row"><span>申請人</span><span>A12****789</span></div>
+            <div class="row"><span>查詢時間</span><span>2026-11-17 10:25</span></div>
+          </div>
+          <div class="warn">同一補助類別每月僅能受理一次，送出後無法重複申請。</div>
+        </div>
+        <div class="footer"><button class="btn">送出申請</button></div>
+      </div>
+      <div class="caption"><span>畫面 4</span>結果：可受理</div>
+      <div class="note">eligible = true；身分證只顯示遮罩值。按「送出申請」才呼叫 /applications，後端會重跑全部檢查，超過 18:00 送出會改顯示畫面 5。</div>
+    </div>
+
+    <!-- 5 不受理：未開放 -->
+    <div class="slot">
+      <div class="phone">
+        <div class="status"><span>19:05</span><span>5G</span></div>
+        <div class="appbar"><span class="back">‹</span>查詢結果</div>
+        <div class="content center">
+          <div class="badge no">不受理</div>
+          <div class="title">目前不在開放時段</div>
+          <div class="desc">線上申請開放時段為每日 09:00–18:00<br>運動補助每月 15–25 日受理，本月已結束</div>
+          <div class="next">
+            <div class="label">下次開放申請</div>
+            <div class="when">12/15（二）09:00</div>
+          </div>
+          <div class="code">reasonCode：OUT_OF_SERVICE_HOURS</div>
+        </div>
+        <div class="footer">
+          <button class="btn">開放時提醒我</button>
+          <button class="btn ghost">查看其他補助</button>
+        </div>
+      </div>
+      <div class="caption"><span>畫面 5</span>結果：不受理（時段外）</div>
+      <div class="note">11/26 19:05 查詢；下次時間同時考慮時段與受理日期，是 12/15 而非隔天。受理期間外使用同一版型。</div>
+    </div>
+
+    <!-- 6 不受理：重複申請 -->
+    <div class="slot">
+      <div class="phone">
+        <div class="status"><span>10:40</span><span>5G</span></div>
+        <div class="appbar"><span class="back">‹</span>查詢結果</div>
+        <div class="content center">
+          <div class="badge no">不受理</div>
+          <div class="title">本月已受理過此補助</div>
+          <div class="desc">同一補助類別每月僅能受理一次</div>
+          <div class="summary">
+            <div class="row"><span>補助類別</span><span>租金補貼</span></div>
+            <div class="row"><span>申請人</span><span>A12****789</span></div>
+            <div class="row"><span>下次可申請</span><span>2026-12-01 09:00</span></div>
+          </div>
+          <div class="code">reasonCode：ALREADY_APPLIED_THIS_MONTH</div>
+        </div>
+        <div class="footer">
+          <button class="btn">查看申請進度</button>
+          <button class="btn ghost">查看其他補助</button>
+        </div>
+      </div>
+      <div class="caption"><span>畫面 6</span>結果：重複申請</div>
+      <div class="note">以（身分證雜湊、類別、年月）判斷；下次可申請時間取自 API 的 nextAvailableAt。送出時後端原子寫入再擋一次，避免同時送出兩次。</div>
+    </div>
+
+  </div>
+</body>
+</html>

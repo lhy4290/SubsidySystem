@@ -1,0 +1,6 @@
+server:
+  port: 8080
+
+subsidy:
+  # 身分證字號雜湊用的 salt。正式環境改由環境變數或 KMS 注入，不寫在設定檔
+  national-id-salt: ${SUBSIDY_NATIONAL_ID_SALT:local-dev-salt-change-me}

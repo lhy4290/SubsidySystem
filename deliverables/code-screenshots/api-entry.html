@@ -1,0 +1,31 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><title>EligibilityController · EligibilityRequest · EligibilityResponse</title><style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#F2F4F3; padding:28px; font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif; display:inline-block; }
+  .win { background:#FFF; border-radius:14px; box-shadow:0 8px 28px rgba(0,0,0,.12); overflow:hidden; border:1px solid #E3E8E5; }
+  .bar { display:flex; align-items:center; gap:14px; padding:12px 18px; border-bottom:1px solid #E3E8E5; background:#FAFBFA; }
+  .dots i { display:inline-block; width:12px; height:12px; border-radius:50%; margin-right:6px; }
+  .file { font-family:Consolas,monospace; font-size:15px; font-weight:700; color:#1F2A24; }
+  .title { font-size:15px; color:#0B3D22; background:#E8F6EE; border-radius:999px; padding:4px 12px; }
+  table { border-collapse:collapse; margin:10px 0 16px; }
+  td { font-family:Consolas,"Cascadia Mono","Microsoft JhengHei",monospace; font-size:16px; line-height:1.6; white-space:pre; vertical-align:top; }
+  .ln { color:#8A958F; text-align:right; padding:0 16px 0 20px; }
+  .code { padding-right:12px; color:#1F2A24; }
+  .badge { width:44px; padding-right:16px; }
+  .badge span { display:inline-block; width:24px; height:24px; line-height:24px; text-align:center; border-radius:50%; background:#00A651; color:#fff; font-size:13px; font-weight:700; font-family:"Microsoft JhengHei",sans-serif; }
+  tr.hit td { background:#F2FAF5; }
+  tr.hit td.ln { box-shadow: inset 3px 0 0 #00A651; }
+  tr.seg td { font-family:Consolas,monospace; font-size:13px; font-weight:700; color:#5F6B66; padding:14px 20px 4px; border-top:1px dashed #D5DCD8; }
+  tr.seg:first-child td { border-top:0; padding-top:4px; }
+  tr.gap td { line-height:1; color:#B8C2BD; }
+  .hljs-keyword, .hljs-literal { color:#A626A4; }
+  .hljs-type, .hljs-title.class_ { color:#0B7A75; }
+  .hljs-title.function_ { color:#2563C9; }
+  .hljs-string { color:#3F8F2F; }
+  .hljs-number { color:#B76B01; }
+  .hljs-comment { color:#7B8780; font-style:italic; }
+  .hljs-meta { color:#B76B01; }
+</style></head><body><div class="win">
+  <div class="bar"><span class="file">EligibilityController · EligibilityRequest · EligibilityResponse</span><span class="title">API 入口：輸入 3 個 String，輸出 Boolean</span></div>
+  <table><tr class="seg"><td colspan="2">EligibilityController.java</td></tr><tr><td class="ln">12</td><td class="code"><span class="hljs-meta">@RestController</span></td></tr><tr><td class="ln">13</td><td class="code"><span class="hljs-meta">@RequestMapping(&quot;/api/v1/subsidies&quot;)</span></td></tr><tr><td class="ln">14</td><td class="code"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">EligibilityController</span> {</td></tr><tr><td class="ln">15</td><td class="code"> </td></tr><tr class="gap"><td class="ln">⋮</td><td></td></tr><tr><td class="ln">22</td><td class="code">    <span class="hljs-comment">/** 資格查詢，唯讀 */</span></td></tr><tr class="hit"><td class="ln">23</td><td class="code">    <span class="hljs-meta">@PostMapping(&quot;/eligibility&quot;)</span></td></tr><tr><td class="ln">24</td><td class="code">    <span class="hljs-keyword">public</span> EligibilityResponse <span class="hljs-title function_">checkEligibility</span><span class="hljs-params">(<span class="hljs-meta">@RequestBody</span> EligibilityRequest request)</span> {</td></tr><tr><td class="ln">25</td><td class="code">        <span class="hljs-keyword">return</span> service.check(request);</td></tr><tr><td class="ln">26</td><td class="code">    }</td></tr><tr><td class="ln">27</td><td class="code"> </td></tr><tr><td class="ln">28</td><td class="code">    <span class="hljs-comment">/** 送件：檢查通過後寫入受理紀錄 */</span></td></tr><tr class="hit"><td class="ln">29</td><td class="code">    <span class="hljs-meta">@PostMapping(&quot;/applications&quot;)</span></td></tr><tr><td class="ln">30</td><td class="code">    <span class="hljs-keyword">public</span> EligibilityResponse <span class="hljs-title function_">submitApplication</span><span class="hljs-params">(<span class="hljs-meta">@RequestBody</span> EligibilityRequest request)</span> {</td></tr><tr><td class="ln">31</td><td class="code">        <span class="hljs-keyword">return</span> service.apply(request);</td></tr><tr><td class="ln">32</td><td class="code">    }</td></tr><tr><td class="ln">33</td><td class="code">}</td></tr>
+<tr class="seg"><td colspan="2">EligibilityRequest.java</td></tr><tr><td class="ln">8</td><td class="code"><span class="hljs-keyword">public</span> <span class="hljs-keyword">record</span> <span class="hljs-title class_">EligibilityRequest</span><span class="hljs-params">(String subsidyType, String birthDate, String nationalId)</span> {</td></tr>
+<tr class="seg"><td colspan="2">EligibilityResponse.java</td></tr><tr><td class="ln">22</td><td class="code">    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> EligibilityResponse <span class="hljs-title function_">of</span><span class="hljs-params">(ReasonCode code, ZonedDateTime checkedAt, ZonedDateTime nextAvailableAt)</span> {</td></tr><tr><td class="ln">23</td><td class="code">        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">EligibilityResponse</span>(</td></tr><tr class="hit"><td class="ln">24</td><td class="code">                code == ReasonCode.ELIGIBLE,   <span class="hljs-comment">// eligible：7 項檢查全數通過為 true</span></td></tr><tr><td class="ln">25</td><td class="code">                code,</td></tr><tr><td class="ln">26</td><td class="code">                code.message(),</td></tr><tr><td class="ln">27</td><td class="code">                checkedAt.truncatedTo(ChronoUnit.SECONDS).toOffsetDateTime(),</td></tr><tr><td class="ln">28</td><td class="code">                nextAvailableAt == <span class="hljs-literal">null</span> ? <span class="hljs-literal">null</span> : nextAvailableAt.toOffsetDateTime());</td></tr><tr><td class="ln">29</td><td class="code">    }</td></tr></table></div></body></html>
